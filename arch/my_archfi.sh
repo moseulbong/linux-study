@@ -496,9 +496,9 @@ formatdevices(){
 		if [ ! "${bootdev}" = "" ]; then
 			formatbootdevice boot ${bootdev}
 		fi
-		if [ ! "${swapdev}" = "" ]; then
+		#if [ ! "${swapdev}" = "" ]; then
 			#formatswapdevice swap ${swapdev}
-		fi
+		#fi
 		formatdevice root ${rootdev}
 		if [ ! "${homedev}" = "" ]; then
 			formatdevice home ${homedev}
