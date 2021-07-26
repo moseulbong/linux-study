@@ -497,7 +497,7 @@ formatdevices(){
 			formatbootdevice boot ${bootdev}
 		fi
 		if [ ! "${swapdev}" = "" ]; then
-			formatswapdevice swap ${swapdev}
+			#formatswapdevice swap ${swapdev}
 		fi
 		formatdevice root ${rootdev}
 		if [ ! "${homedev}" = "" ]; then
@@ -750,11 +750,12 @@ mountparts(){
 	mount -o noatime,compress=lzo,space_cache,subvol=@home ${rootdev} /mnt/home
 	mount -o noatime,compress=lzo,space_cache,subvol=@opt ${rootdev} /mnt/opt
 	mount -o noatime,compress=lzo,space_cache,subvol=@srv ${rootdev} /mnt/srv
-	mount -o noatime,compress=lzo,space_cache,subvol=@tmp ${rootdev} /mnt/tmp	
-	mount -o nodatacow,subvol=@swap ${rootdev} /mnt/swap	
+	mount -o noatime,compress=lzo,space_cache,subvol=@tmp ${rootdev} /mnt/tmp
 	mount -o nodatacow,subvol=@var ${rootdev} /mnt/var
 	mount ${bootdev} /mnt/boot
 	
+	formatswapdevice swap ${swapdev}
+	mount -o nodatacow,subvol=@swap ${rootdev} /mnt/swap	
 	swapon /swap/swapfile
 	
 	pressanykey
