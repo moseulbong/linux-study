@@ -564,12 +564,12 @@ formatswapdevice(){
 			echo "mkswap ${swapdev}"
 			# mkswap ${swapdev}
 			# echo ""
-			truncate -s 0 /swap/swapfile
-			chattr +C /swap/swapfile
-			btrfs property set /swap/swapfile compression none
-			dd if=/dev/zero of=/swap/swapfile bs=1G count=2 status=progress
-			chmod 600 /swap/swapfile
-			mkswap /swap/swapfile
+			truncate -s 0 /mnt/swap/swapfile
+			chattr +C /mnt/swap/swapfile
+			btrfs property set /mnt/swap/swapfile compression none
+			dd if=/dev/zero of=/mnt/swap/swapfile bs=1G count=2 status=progress
+			chmod 600 /mnt/swap/swapfile
+			mkswap /mnt/swap/swapfile
 			# swapon /swap/swapfile
 			pressanykey		    	
 		;;
@@ -755,7 +755,7 @@ mountparts(){
 	mount ${bootdev} /mnt/boot
 	
 	formatswapdevice swap ${swapdev}
-	mount -o nodatacow,subvol=@swap ${rootdev} /mnt/swap	
+	mount -o nodatacow,subvol=@swap ${rootdev} /mnt/swap
 	swapon /swap/swapfile
 	
 	pressanykey
