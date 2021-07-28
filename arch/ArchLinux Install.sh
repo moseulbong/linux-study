@@ -3,13 +3,11 @@ Arch Linux 설치
 
 ## 설치 준비
 
-### 키보드 로드
-
-지원 키보드 목록
+#지원 키보드 목록
 
     ls /usr/share/kbd/keymaps/**/*.map.gz
 
-키보드 로드
+#키보드 로드
 
     loadkeys us
 
@@ -26,19 +24,19 @@ Arch Linux 설치
 
 ### 디스크 파티션 & 포맷 & 마운트
 
-디스크 목록
+#디스크 목록
 
     lsblk
 
-파티션 설정하기
+#파티션 설정하기
 
     cfdisk /dev/disk #boot, root 파티션 생성
 
-btrfs로 포맷
+#btrfs로 포맷
 
     mkfs.btrfs /dev/root-partition
 	
-subvol 만들기
+#subvol 만들기
 	mount /dev/root-partition /mnt
 	cd /mnt
 	btrfs subvolume create @
@@ -64,17 +62,18 @@ subvol 만들기
 #mirrorlist 설정하기
 
 	sudo pacman -S reflector
-	sudo reflector --country "South Korea" --country Japan --sort rate --latest 10 --number 5 --save /etc/pacman.d/mirrorlist	
+	sudo reflector --country "South Korea" --country Japan --sort rate --latest 10 --number 5 --save /etc/pacman.d/mirrorlist
+	cp  /etc/pacman.d/mirrorlist  /mnt/etc/pacman.d/mirrorlist
 	
-base system 설치
+#base system 설치
 
 	pacstrap /mnt base linux linu-firmware nano intel-ucode btrfs-progs
 	
-/etc/fstab 수정
+#/etc/fstab 수정
 
-	genfstab -U /mnt >> /mnt/etc/fstab
+	genfstab -U /mnt >> /mnt/etc/fstab	
 	
-CHROOT
+#CHROOT ####################################################################
 
 	arch-chroot /mnt
 
@@ -96,50 +95,50 @@ CHROOT
 
 ### 지역 시간대
 
-지원 지역 시간대 보기
+#지원 지역 시간대 보기
 
     ls /usr/share/zoneinfo
     ls /usr/share/zoneinfo/Asia
 
-`/etc/localtime` 생성
+#`/etc/localtime` 생성
 
     ln -s /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 
-`/etc/adjtime` 생성
+#`/etc/adjtime` 생성
 
     hwclock --systohc --utc
 
 
 ### 로케일
 
-`/etc/locale.gen`에서 필요한 로케일의 주석을 제거
+#`/etc/locale.gen`에서 필요한 로케일의 주석을 제거
 
     /etc/locale.gen
     --------
     en_US.UTF-8 UTF-8
     ko_KR.UTF-8 UTF-8
 
-로케일 생성
+# 로케일 생성
 
     locale-gen
 
-`/etc/locale.conf` 생성
+# `/etc/locale.conf` 생성
 
     echo LANG=en_US.UTF-8 >> /etc/locale.conf
 
 ### 호스트 네임
 
-`/etc/hostname` 생성
+# `/etc/hostname` 생성
 
     hostnamectl set-hostname moseubong
 
-`/etc/hosts` 편집: 
+# `/etc/hosts` 편집: 
 
 	127.0.0.1	localhost
 	::1			localhost
 	127.0.1.1	moseubong.localdomain	moseubong
 	
-ROOT PASSWD 설정하기
+# ROOT PASSWD 설정하기
 
 		passwd
 		
@@ -157,15 +156,16 @@ ROOT PASSWD 설정하기
     sudo pacman -S reflector
     sudo reflector --verbose -l 20 --sort rate -n 5 --save /etc/pacman.d/mirrorlist
 
-package 추가 설치
+# package 추가 설치
 
 	pacman -S grub grub-btrfs networkmanager network-manager-applet wpa_supplicant dialog os-prober 
 	               mtools dosfstools base-devel linux-headers git reflector bluez bluez-utils cups
 	
-/etc/mkinitcpio.conf 수정
+# /etc/mkinitcpio.conf 수정
 
 		#MODULES=() 라인 수정
 		MODULES=(btrfs)
+		
 		mkinitcpio -p linux
 		
 		
@@ -197,39 +197,39 @@ package 추가 설치
 
 ## 재시작 ##
 
-chroot을 나간 후 재시작
+# chroot을 나간 후 재시작
 
     exit
 	umount -a
     reboot
 
-그 후, 루트계정으로 로그인
+# 그 후, 루트계정으로 로그인
 
 
 ## 추가 설정 ###################################################################################
 
 ### NetworkManager 설정
 
-NetworkManager 데몬을 systemd에 등록
+# NetworkManager 데몬을 systemd에 등록
 
     systemctl enable NetworkManager.service
 
-NetworkManager 데몬 실행
+# NetworkManager 데몬 실행
 
     systemctl start NetworkManager.service
 
-접속 설정
+# 접속 설정
 
     nmtui
 
 
 ### 스왑 옵션 조절
 
-옵션 확인
+# 옵션 확인
 
     cat /proc/sys/vm/swappiness
 
-수정
+# 수정
 
     /etc/sysctl.d/99-sysctl.conf
     --------
@@ -238,23 +238,23 @@ NetworkManager 데몬 실행
 
 ### 필수 패키지 설치
 
-multilib을 사용할 수 있도록 설정
+# multilib을 사용할 수 있도록 설정
 
     /etc/pacman.conf
     --------
     [multilib]
     Include = /etc/pacman.d/mirrorlist
 
-패키지 목록 갱신
+# 패키지 목록 갱신
 
     pacman -Syu
 
-필수 도구 설치 (64비트- 32비트 호환):
+# 필수 도구 설치 (64비트- 32비트 호환):
 
     pacman -S multilibdevel fakeroot jshon wget pkg-config patch sudo git zsh
 
 
-wheel그룹을 sudoer로 등록
+# wheel그룹을 sudoer로 등록
 
     visudo
     --------
@@ -263,12 +263,9 @@ wheel그룹을 sudoer로 등록
 
 ### 배터리 관리 패키지 설치
 
-    pacman -S tlp ethtool lsb-release smartmontools acpi_call
+    pacman -S tlp ethtool lsb-release smartmontools
 
-* 위 패키지 중에서 tp_smapi는 씽크패드 전용이다.
-* 위 패키지 중에서 acpi_call은 샌디브릿지 이후 씽크패드 전용이다.
-
-설치후 데몬을 등록한다.
+# 설치후 데몬을 등록한다.
 
     systemctl disable systemd-rfkill.service
     systemctl enable tlp.service
@@ -277,7 +274,7 @@ wheel그룹을 sudoer로 등록
 
 ### Xorg, 사운드, 비디오 드라이버 설치
 
-사운드
+# 사운드
 
     pacman -S alsa-utils lib32-libpulse
 	alsa-mixer
@@ -331,24 +328,24 @@ wheel그룹을 sudoer로 등록
 	systemctl enable gdm
 
 
-이제 시스템을 재시작하고 새로 만든 계정으로 로그인 한다.
+####### 이제 시스템을 재시작하고 새로 만든 계정으로 로그인 한다.
 
 
 ### oh-my-zsh 설치
 
-**개인 계정으로 로그인한 후,**
+# **개인 계정으로 로그인한 후,**
 
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+    # sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
-재 로그인.
+# 재 로그인.
 
 ### 폰트 설치
 
-고정폭 TTF
+# 고정폭 TTF
 
     sudo pacman -S adobe-source-code-pro-fonts
 
-한글 TTF
+# 한글 TTF
 
     yaourt -S ttf-nanum ttf-nanumgothic_coding
 
@@ -380,7 +377,7 @@ wheel그룹을 sudoer로 등록
 
 ### 텔레그램
 
-<https://desktop.telegram.org> 에서 다운로드
+# <https://desktop.telegram.org> 에서 다운로드
 
 
 ### 네트워크
