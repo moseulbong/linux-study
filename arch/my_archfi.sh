@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Arch Linux Fast Install (archfi)
+# Arch Linux Fast Install (archfi) My only version
 # --------------------------------
+# original verion
 # author    : MatMoul
 #             https://github.com/MatMoul
 #             http://sourceforge.net/u/matmoul
