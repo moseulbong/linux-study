@@ -50,8 +50,8 @@ subvol 만들기
 	btrfs subvolume create @swap
 	btrfs subvolume create @.snapshots
 	cd
-	umount /mnt
-	mount -o noatime,compress=lzo,space_cache,subvol=@ /dev/root-partition /mnt
+#	umount /mnt
+	mount -o remount,noatime,compress=lzo,space_cache,subvol=@ /dev/root-partition /mnt
 	mkdir /mnt/{boot,home,var,opt,srv,tmp,swap,.snapshots}	
 	mount -o noatime,compress=lzo,space_cache,subvol=@home /dev/root-partition /mnt/home
 	mount -o noatime,compress=lzo,space_cache,subvol=@opt /dev/root-partition /mnt/opt
@@ -60,6 +60,11 @@ subvol 만들기
 	mount -o nodatacow,subvol=@swap /dev/root-partition /mnt/swap	
 	mount -o nodatacow,subvol=@var /dev/root-partition /mnt/var
 	mount /dev/boot-partition /mnt/boot
+	
+#mirrorlist 설정하기
+
+	sudo pacman -S reflector
+	sudo reflector --country "South Korea" --country Japan --sort rate --latest 10 --number 5 --save /etc/pacman.d/mirrorlist	
 	
 base system 설치
 
@@ -137,10 +142,25 @@ CHROOT
 ROOT PASSWD 설정하기
 
 		passwd
+		
+#User Add
+		useradd -m -G wheel -s /bin/bash moseulbong
+		passwd moseulbong
+		
+#SuDoer 편집
+
+		EDITOR=nano visudo
+		%wheel  # 리마크 부분 제거
+
+### pacman mirror 설정
+
+    sudo pacman -S reflector
+    sudo reflector --verbose -l 20 --sort rate -n 5 --save /etc/pacman.d/mirrorlist
 
 package 추가 설치
 
-	pacman -S grub grub-btrfs networkmanager network-manager-applet wpa_supplicant dialog os-prober mtools dosfstools base-devel linux-headers git reflector bluez bluez-utils cups
+	pacman -S grub grub-btrfs networkmanager network-manager-applet wpa_supplicant dialog os-prober 
+	               mtools dosfstools base-devel linux-headers git reflector bluez bluez-utils cups
 	
 /etc/mkinitcpio.conf 수정
 
@@ -153,20 +173,20 @@ package 추가 설치
 
 ### NIC 설정
 
-NIC 이름 목록
+# NIC 이름 목록
 
-    ls /sys/class/net
+    # ls /sys/class/net
 
-NIC 목록 자세히 보기
+# NIC 목록 자세히 보기
 
-    ip link
+    # ip link
 
-NIC 이름 수동 설정
+# NIC 이름 수동 설정
 
-    /etc/udev/rules.d/10-network.rules
-    --------
-    SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="aa:bb:cc:dd:ee:ff", NAME="net1"
-    SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="ff:ee:dd:cc:bb:aa", NAME="net0"
+    # /etc/udev/rules.d/10-network.rules
+    # --------
+    # SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="aa:bb:cc:dd:ee:ff", NAME="net1"
+    # SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="ff:ee:dd:cc:bb:aa", NAME="net0"
 
 
 ### GRUB 설치
@@ -175,17 +195,18 @@ NIC 이름 수동 설정
     grub-mkconfig -o /boot/grub/grub.cfg
 
 
-## 재시작
+## 재시작 ##
 
 chroot을 나간 후 재시작
 
     exit
+	umount -a
     reboot
 
 그 후, 루트계정으로 로그인
 
 
-## 추가 설정
+## 추가 설정 ###################################################################################
 
 ### NetworkManager 설정
 
@@ -259,32 +280,39 @@ wheel그룹을 sudoer로 등록
 사운드
 
     pacman -S alsa-utils lib32-libpulse
-    alsa-mixer
-	
+	alsa-mixer
+	speaker-test -c2
 
 ### yay 설치
 
 	pacman -S yay
-
-#or
-
+	#or
 	cd /opt
     git clone https://aur.archlinux.org/yay.git
-    sudo chown -R pablinux:users ./yay
+    sudo chown -R 사용자ID:users ./yay
 	cd yay
     makepkg -si
 
 ##gnome, Budgie 설치
+
 	
-	pacman -S --needed xf86-video-intel
-	pacman -S --needed xorg xorg-server gnome gnome-tweaks gnome-control-center nautilus-sendto gnome-nettool gnome-usage gnome multi-writer adwaita-icon-theme chrome-gnome-shell xdg-user-dirs-gtk fwupd arc-gtk-theme seahosrse gdm budgie-desktop
-	pacman -S --needed firefox vlc filezilla leafpad xscreensaver archlinux-wallpaper
-	pacman -S --needed fontconfig xorg-font-utils fontforg
+	# pacman -S --needed xf86-video-intel
+	# pacman -S --needed xorg xorg-server gnome gnome-tweaks gnome-control-center nautilus-sendto gnome-nettool gnome-usage gnome multi-writer adwaita-icon-theme chrome-gnome-shell xdg-user-dirs-gtk fwupd arc-gtk-theme seahosrse gdm budgie-desktop
+	# pacman -S --needed firefox vlc filezilla leafpad xscreensaver archlinux-wallpaper
+	# pacman -S --needed fontconfig xorg-font-utils fontforg
+	
+# XFCE4 설치	
+	
+	pacman -S --needed xorg xorg-xinit xterm, xf86-video-intel
+	pacman -S --needed xfce4 xfce4-goodies
+	pacman -S --needed lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings capitaine-cursors arc-gtk-theme xdg-user-dirs-gtk
 	pacman -S --needed terminus-font noto-fonts-cjk ttf-dejavu
 	
-	yay -S nimf
+	systemctl enable lightdm	
 	
 #nimf 적용
+
+	yay -S nimf
 
 	#.xprofile수정
 	
@@ -302,10 +330,6 @@ wheel그룹을 sudoer로 등록
 
 	systemctl enable gdm
 
-### 사용자 추가
-
-    useradd -m -G users,wheel -s /bin/zsh bakyeono
-    passwd bakyeono
 
 이제 시스템을 재시작하고 새로 만든 계정으로 로그인 한다.
 
@@ -318,15 +342,6 @@ wheel그룹을 sudoer로 등록
 
 재 로그인.
 
-
-
-
-### pacman mirror 설정
-
-    sudo pacman -S reflector
-    sudo reflector --verbose -l 20 --sort rate -n 5 --save /etc/pacman.d/mirrorlist
-
-
 ### 폰트 설치
 
 고정폭 TTF
@@ -336,66 +351,6 @@ wheel그룹을 sudoer로 등록
 한글 TTF
 
     yaourt -S ttf-nanum ttf-nanumgothic_coding
-
-
-### 한글 입력기 (ibus) 설치 / 설정
-
-패키지 설치
-
-    sudo pacman -S ibus ibus-hangul
-
-ibus-daemon 설정
-
-    $HOME/.xprofile
-    ----
-    export GTK_IM_MODULE=ibus
-    export XMODIFIERS=@im=ibus
-    export QT_IM_MODULE=ibus
-    ibus-daemon -drx
-
-입력기 설정
-
-* 입력 방식은 Korean - Hangul 하나만 두고, 다른 것은 제거
-* 한글 토글 키는 Hangul, Alt_R
-* 한자 키는 Hangul_Hanja, Control_R
-* Tray Icon: false
-
-
-## 씽크패드용 설정
-
-### 배터리 관리
-
-앞에서 설치했음.
-
-
-### 트랙포인트
-
-    sudo xf86-input-libinput
-
-    sudo vi /etc/udev/rules.d/10-trackpoint.rules
-    --------
-    ACTION=="add", SUBSYSTEM=="input", ATTR{name}=="TPPS/2 IBM TrackPoint", ATTR{device/sensitivity}="220", ATTR{device/speed}="190", ATTR{device/inertia}="6", ATTR{device/press_to_select}="0"
-
-
-### 지문인식기
-
-지문 인식기는 식별용으로만 쓰는 게 낫다. 인증에 쓰는 것은 보안상 좋지 않다.
-
-지문 인식기 설치
-
-    yaourt -S fingerprint-gui
-
-지문 등록
-
-    sudo gpasswd -a bakyeono plugdev
-    fingerprint-gui
-
-sudo에 적용
-
-    sudo vi /etc/pam.d/sudo
-    --------
-    auth	sufficient	pam_fingerprint-gui.so
-
 
 ## 유틸리티 설치
 
