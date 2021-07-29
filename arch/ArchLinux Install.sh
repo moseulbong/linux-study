@@ -63,11 +63,10 @@ Arch Linux 설치
 
 	sudo pacman -S reflector
 	sudo reflector --country "South Korea" --country Japan --sort rate --latest 10 --number 5 --save /etc/pacman.d/mirrorlist
-	cp  /etc/pacman.d/mirrorlist  /mnt/etc/pacman.d/mirrorlist
 	
 #base system 설치
 
-	pacstrap /mnt base linux linu-firmware nano intel-ucode btrfs-progs
+	pacstrap /mnt base linux linux-firmware nano intel-ucode btrfs-progs
 	
 #/etc/fstab 수정
 
@@ -76,23 +75,7 @@ Arch Linux 설치
 #CHROOT ####################################################################
 
 	arch-chroot /mnt
-
-스왑 영역 만들기
-
-    truncate -s 0 /swap/swapfile
-	chattr +C /swap/swapfile
-	btrfs property set /swap/swapfile compression none
-	dd if=/dev/zero of=/swap/swapfile bs=1G count=2 status=progress
-	chmod 600 /swap/swapfile
-	mkswap /swap/swapfile
-	swapon /swap/swapfile
 	
-/etc/fstab 수정
-	
-	nano /etc/fstab
-	"/swap/swapfile	none	swap	defaults	0 0" 삽입
-
-
 ### 지역 시간대
 
 #지원 지역 시간대 보기
@@ -126,6 +109,23 @@ Arch Linux 설치
 
     echo LANG=en_US.UTF-8 >> /etc/locale.conf
 
+
+#스왑 영역 만들기
+
+    truncate -s 0 /swap/swapfile
+	chattr +C /swap/swapfile
+	btrfs property set /swap/swapfile compression none
+	dd if=/dev/zero of=/swap/swapfile bs=1G count=2 status=progress
+	chmod 600 /swap/swapfile
+	mkswap /swap/swapfile
+	swapon /swap/swapfile
+	
+# /etc/fstab 수정
+	
+	nano /etc/fstab
+	"/swap/swapfile	none	swap	defaults	0 0" 삽입
+
+
 ### 호스트 네임
 
 # `/etc/hostname` 생성
@@ -155,11 +155,11 @@ Arch Linux 설치
 
     sudo pacman -S reflector
     sudo reflector --verbose -l 20 --sort rate -n 5 --save /etc/pacman.d/mirrorlist
-
+	
 # package 추가 설치
 
-	pacman -S grub grub-btrfs networkmanager network-manager-applet wpa_supplicant dialog os-prober 
-	               mtools dosfstools base-devel linux-headers git reflector bluez bluez-utils cups
+	pacman -S grub grub-btrfs grub-customizer networkmanager network-manager-applet wpa_supplicant dialog os-prober 
+	          mtools dosfstools base-devel linux-headers git reflector bluez bluez-utils cups
 	
 # /etc/mkinitcpio.conf 수정
 
@@ -221,7 +221,17 @@ Arch Linux 설치
 # 접속 설정
 
     nmtui
-
+	
+	
+#ZRAM 설정 (swap 대타)	
+	git clone https://aur.archlinux.org/paru-bin
+	cd paru-bin
+	makepkg -si
+	paru -S zramd
+	nano /etc/default/zramd
+		MAX_SIZE=2048 #수정
+		
+	systemctl enable zramd.service
 
 ### 스왑 옵션 조절
 
@@ -254,13 +264,6 @@ Arch Linux 설치
     pacman -S multilibdevel fakeroot jshon wget pkg-config patch sudo git zsh
 
 
-# wheel그룹을 sudoer로 등록
-
-    visudo
-    --------
-    %wheel ALL=(ALL) ALL
-
-
 ### 배터리 관리 패키지 설치
 
     pacman -S tlp ethtool lsb-release smartmontools
@@ -276,19 +279,14 @@ Arch Linux 설치
 
 # 사운드
 
-    pacman -S alsa-utils lib32-libpulse
-	alsa-mixer
+    pacman -S alsa-utils pulseaudio pulseaudio-alsa pavucontrol libcanberra-pulse lib32-libpulse lib32-libcanberra-pulse lib32-alsa-plugins
+	paru xfce4-volumed-pulse
+	alsamixer
 	speaker-test -c2
-
-### yay 설치
-
-	pacman -S yay
-	#or
-	cd /opt
-    git clone https://aur.archlinux.org/yay.git
-    sudo chown -R 사용자ID:users ./yay
-	cd yay
-    makepkg -si
+	
+#/etc/modprobe.d/modprobe.conf 수정
+		
+		options snd-hda-intel model=ALC259 psition_fix=3 #라인 삽입
 
 ##gnome, Budgie 설치
 
@@ -300,7 +298,7 @@ Arch Linux 설치
 	
 # XFCE4 설치	
 	
-	pacman -S --needed xorg xorg-xinit xterm, xf86-video-intel
+	pacman -S --needed xorg xorg-xinit xterm xf86-video-intel
 	pacman -S --needed xfce4 xfce4-goodies
 	pacman -S --needed lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings capitaine-cursors arc-gtk-theme xdg-user-dirs-gtk
 	pacman -S --needed terminus-font noto-fonts-cjk ttf-dejavu
@@ -309,7 +307,7 @@ Arch Linux 설치
 	
 #nimf 적용
 
-	yay -S nimf
+	paru -S nimf
 
 	#.xprofile수정
 	
@@ -321,11 +319,11 @@ Arch Linux 설치
 	
 	$ nimf-settings
 	
-	#option
-	$ gsettings set org.gnome.settings-daemon.plugins.keyboard active false
-	$ gsettings set org.gnome.settings-daemon.plugins.xsettings overrides "{'Gtk/IMModule':<'nimf'>}"
+# #option
+	# $ gsettings set org.gnome.settings-daemon.plugins.keyboard active false
+	# $ gsettings set org.gnome.settings-daemon.plugins.xsettings overrides "{'Gtk/IMModule':<'nimf'>}"
 
-	systemctl enable gdm
+	# systemctl enable gdm
 
 
 ####### 이제 시스템을 재시작하고 새로 만든 계정으로 로그인 한다.
@@ -367,7 +365,11 @@ Arch Linux 설치
 
 ### 웹 브라우저
 
-    sudo pacman -S firefox chromium opera
+    sudo pacman -S firefox google-chrome
+
+### 압축
+
+    sudo pacman -S xarchiver file-roller engrampa ark
 
 
 ### 이메일
@@ -408,11 +410,6 @@ Arch Linux 설치
 ### 에뮬레이터
 
     sudo pacman -S dosbox zsnes
-
-
-### 압축
-
-    sudo pacman -S zip unzip p7zip
 
 
 ## 개발 도구 설치
