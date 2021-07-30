@@ -298,26 +298,34 @@ Arch Linux 설치
 	# pacman -S --needed firefox vlc filezilla leafpad xscreensaver archlinux-wallpaper
 	# pacman -S --needed fontconfig xorg-font-utils fontforg
 	
-# XFCE4 설치	
+#xorg, lightdm, 기본폰트 설치	
 	
 	pacman -S --needed xorg xorg-xinit xterm xf86-video-intel
-	pacman -S --needed xfce4 xfce4-goodies
 	pacman -S --needed lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings capitaine-cursors arc-gtk-theme xdg-user-dirs-gtk
 	pacman -S --needed terminus-font noto-fonts-cjk ttf-dejavu
+	
+# XFCE4 설치	
+	
+	pacman -S --needed xfce4 xfce4-goodies
 	
 	
 #deepin 설치시
 	
-	pacman -S --needed xorg xorg-xinit xterm xf86-video-intel
 	pacman -S --needed deepin deepin-extra google-chrome
-	pacman -S --needed terminus-font noto-fonts-cjk ttf-dejavu
 	
-	nano /etc/lightdm/lightdm.conf
-		greeter-session=lightdm-deepin-greeter
-		display-setup-script=xrandr --output xxxxx --move nnnn x nnnn
+		
+#budgie-desktop 설치시
+
+	pacman -S --needed budgie-desktop gnome
 		
 #창관리자 start
 	
+	nano /etc/lightdm/lightdm.conf
+		greeter-session=lightdm-gtk-greeter
+		#or
+		greeter-session=lightdm-deepin-greeter
+		display-setup-script=xrandr --output xxxxx --move nnnn x nnnn
+		
 	systemctl enable lightdm
 	
 #nimf 적용
