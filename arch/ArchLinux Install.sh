@@ -305,13 +305,20 @@ Arch Linux 설치
 	pacman -S --needed lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings capitaine-cursors arc-gtk-theme xdg-user-dirs-gtk
 	pacman -S --needed terminus-font noto-fonts-cjk ttf-dejavu
 	
-	systemctl enable lightdm
 	
 #deepin 설치시
 	
 	pacman -S --needed xorg xorg-xinit xterm xf86-video-intel
 	pacman -S --needed deepin deepin-extra google-chrome
 	pacman -S --needed terminus-font noto-fonts-cjk ttf-dejavu
+	
+	nano /etc/lightdm/lightdm.conf
+		greeter-session=lightdm-deepin-greeter
+		display-setup-script=xrandr --output xxxxx --move nnnn x nnnn
+		
+#창관리자 start
+	
+	systemctl enable lightdm
 	
 #nimf 적용
 
