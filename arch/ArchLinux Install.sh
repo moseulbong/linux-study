@@ -316,7 +316,7 @@ Arch Linux 설치
 		
 #budgie-desktop 설치시
 
-	pacman -S --needed budgie-desktop gnome
+	pacman -S --needed budgie-desktop gnome celluloid 
 		
 #창관리자 start
 	
