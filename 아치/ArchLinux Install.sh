@@ -153,8 +153,8 @@ Arch Linux 설치
 
 ### pacman mirror 설정
 
-    sudo pacman -S reflector
-    sudo reflector --verbose -l 20 --sort rate -n 5 --save /etc/pacman.d/mirrorlist
+    #sudo pacman -S reflector
+    #sudo reflector --verbose -l 20 --sort rate -n 5 --save /etc/pacman.d/mirrorlist
 	
 # package 추가 설치
 
