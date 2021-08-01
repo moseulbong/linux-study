@@ -159,7 +159,7 @@ Arch Linux 설치
 # package 추가 설치
 
 	pacman -S grub grub-btrfs grub-customizer networkmanager network-manager-applet wpa_supplicant dialog os-prober 
-	          mtools dosfstools base-devel linux-headers git reflector bluez bluez-utils cups
+	          mtools dosfstools base-devel linux-headers git reflector bluez bluez-utils cups iwd
 	
 # /etc/mkinitcpio.conf 수정
 
@@ -217,6 +217,11 @@ Arch Linux 설치
 # NetworkManager 데몬 실행
 
     systemctl start NetworkManager.service
+
+# WiFi 데몬 등록 실행
+
+     systemctl enable iwd.service
+     systemctl start iwd.service
 
 # 접속 설정
 
