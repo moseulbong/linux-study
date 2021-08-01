@@ -188,11 +188,11 @@ Arch Linux 설치
 		
 ## 무선네트워크 설정
 
-	#console 명령
+	#console 명령, {DEVICE}=wlan0
 	iwctl device list
-	iwctl station DEVICE scan
-	iwctl station DEVICE get-networks
-	iwctl --passphrase=PASSPHRASE(비번) station DEVICE connect SSID
+	iwctl station {DEVICE} scan
+	iwctl station {DEVICE} get-networks
+	iwctl --passphrase=PASSPHRASE(비번) station {DEVICE} connect SSID
 
 	## systemd-networkd 설정
 		#/etc/systemd/network/25-wireless.network 수정 또는 생성
