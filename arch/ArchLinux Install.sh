@@ -186,21 +186,28 @@ Arch Linux 설치
 
 ## 추가 설정 ###################################################################################
 		
-## 네트워크 설정
-## systemd-networkd 설정
-	#/etc/systemd/network/25-wireless.network 수정 또는 생성
-		[Match]
-		Name=wlp2s0
+## 무선네트워크 설정
+
+	#console 명령
+	iwctl device list
+	iwctl station DEVICE scan
+	iwctl station DEVICE get-networks
+	iwctl --passphrase=PASSPHRASE(비번) station DEVICE connect SSID
+
+	## systemd-networkd 설정
+		#/etc/systemd/network/25-wireless.network 수정 또는 생성
+			[Match]
+			Name=wlp2s0
 		
-		[Network]
-		DHCP=ipv4
-	#/etc/wpa_supplicant/wpa_supplicant-wlp2s0.conf 수정 또는 생성
-		ctrl_interface=/run/wpa_supplicant
-		update_config=1
-		network={
-			ssid="mysweethome"
-			psk="mypassword"
-		}
+			[Network]
+			DHCP=ipv4
+		#/etc/wpa_supplicant/wpa_supplicant-{DEVICE}.conf 수정 또는 생성
+			ctrl_interface=/run/wpa_supplicant
+			update_config=1
+			network={
+				ssid="SSID"
+				psk="mypassword"
+			}
 		
 	systemctl # systemd-networkd, wpa_supplicant 데몬 실행여부 확인
 	
