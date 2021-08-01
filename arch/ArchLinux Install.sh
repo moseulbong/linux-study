@@ -66,7 +66,7 @@ Arch Linux 설치
 	
 #base system 설치
 
-	pacstrap /mnt base linux linux-firmware nano intel-ucode btrfs-progs
+	pacstrap /mnt base linux linux-firmware nano intel-ucode btrfs-progs base-devel linux-headers
 	
 #/etc/fstab 수정
 
@@ -158,8 +158,7 @@ Arch Linux 설치
 	
 # package 추가 설치
 
-	pacman -S grub grub-btrfs grub-customizer networkmanager network-manager-applet wpa_supplicant dialog os-prober 
-	          mtools dosfstools base-devel linux-headers git reflector bluez bluez-utils cups iwd
+	pacman -S grub grub-btrfs grub-customizer iwd wpa_supplicant dialog os-prober mtools dosfstools git reflector bluez bluez-utils cups
 	
 # /etc/mkinitcpio.conf 수정
 
@@ -167,27 +166,6 @@ Arch Linux 설치
 		MODULES=(btrfs)
 		
 		mkinitcpio -p linux
-		
-		
-## 네트워크 설정
-
-### NIC 설정
-
-# NIC 이름 목록
-
-    # ls /sys/class/net
-
-# NIC 목록 자세히 보기
-
-    # ip link
-
-# NIC 이름 수동 설정
-
-    # /etc/udev/rules.d/10-network.rules
-    # --------
-    # SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="aa:bb:cc:dd:ee:ff", NAME="net1"
-    # SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="ff:ee:dd:cc:bb:aa", NAME="net0"
-
 
 ### GRUB 설치
 
@@ -207,27 +185,34 @@ Arch Linux 설치
 
 
 ## 추가 설정 ###################################################################################
-
-### NetworkManager 설정
-
-# NetworkManager 데몬을 systemd에 등록
-
-    systemctl enable NetworkManager.service
-
-# NetworkManager 데몬 실행
-
-    systemctl start NetworkManager.service
-
-# WiFi 데몬 등록 실행
-
-     systemctl enable iwd.service
-     systemctl start iwd.service
-
-# 접속 설정
-
-    nmtui
+		
+## 네트워크 설정
+## systemd-networkd 설정
+	#/etc/systemd/network/25-wireless.network 수정 또는 생성
+		[Match]
+		Name=wlp2s0
+		
+		[Network]
+		DHCP=ipv4
+	#/etc/wpa_supplicant/wpa_supplicant-wlp2s0.conf 수정 또는 생성
+		ctrl_interface=/run/wpa_supplicant
+		update_config=1
+		network={
+			ssid="mysweethome"
+			psk="mypassword"
+		}
+		
+	systemctl # systemd-networkd, wpa_supplicant 데몬 실행여부 확인
 	
+	systemctl enable systemd-networkd.service # or stop
+	systemctl start systemd-networkd.service
 	
+	systemctl enable wpa_supplicant.service # or stop
+	systemctl start wpa_supplicant.service
+	
+	#ping test
+		ping 1.1.1.1
+
 #ZRAM 설정 (swap 대타)	
 	git clone https://aur.archlinux.org/paru-bin
 	cd paru-bin
@@ -299,7 +284,7 @@ Arch Linux 설치
 
 	
 	# pacman -S --needed xf86-video-intel
-	# pacman -S --needed xorg xorg-server gnome gnome-tweaks gnome-control-center nautilus-sendto gnome-nettool gnome-usage gnome multi-writer adwaita-icon-theme chrome-gnome-shell xdg-user-dirs-gtk fwupd arc-gtk-theme seahosrse gdm budgie-desktop
+	# pacman -S --needed xorg xorg-server gnome gnome-tweaks gnome-control-center nautilus-sendto gnome-nettool gnome-usage gnome multi-writer adwaita-icon-theme chrome-gnome-shell xdg-user-dirs-gtk fwupd arc-gtk-theme seahosrse budgie-desktop
 	# pacman -S --needed firefox vlc filezilla leafpad xscreensaver archlinux-wallpaper
 	# pacman -S --needed fontconfig xorg-font-utils fontforg
 	
