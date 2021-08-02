@@ -3,6 +3,15 @@ Arch Linux 설치
 
 ## 설치 준비
 
+#무선 경우
+
+	iwctl
+
+	[iwd]$ device list
+	[iwd]$ station wlan0 scan
+	[iwd]$ station wlan0 get-networks
+	[iwd]$ station wlan0 connect SSiD
+
 #지원 키보드 목록
 
     ls /usr/share/kbd/keymaps/**/*.map.gz
