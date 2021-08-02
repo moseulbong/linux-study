@@ -140,16 +140,16 @@ Arch Linux 설치
 	
 # ROOT PASSWD 설정하기
 
-		passwd
+	passwd
 		
 #User Add
-		useradd -m -G wheel -s /bin/bash moseulbong
-		passwd moseulbong
+	useradd -m -G wheel -s /bin/bash moseulbong
+	passwd moseulbong
 		
 #SuDoer 편집
 
-		EDITOR=nano visudo
-		%wheel  # 리마크 부분 제거
+	EDITOR=nano visudo
+	%wheel  # 리마크 부분 제거
 
 ### pacman mirror 설정
 
@@ -158,7 +158,7 @@ Arch Linux 설치
 	
 # package 추가 설치
 
-	pacman -S grub grub-btrfs grub-customizer iwd wpa_supplicant dialog os-prober mtools dosfstools git reflector bluez bluez-utils cups
+	pacman -S grub grub-btrfs grub-customizer networkmanager network-manager-app iwd dialog os-prober mtools dosfstools git reflector bluez bluez-utils cups
 	
 # /etc/mkinitcpio.conf 수정
 
@@ -188,37 +188,9 @@ Arch Linux 설치
 		
 ## 무선네트워크 설정
 
-	#console 명령, {DEVICE}=wlan0
-	iwctl device list
-	iwctl station {DEVICE} scan
-	iwctl station {DEVICE} get-networks
-	iwctl --passphrase=PASSPHRASE(비번) station {DEVICE} connect SSID
-
-	## systemd-networkd 설정
-		#/etc/systemd/network/25-wireless.network 수정 또는 생성
-			[Match]
-			Name=wlp2s0
-		
-			[Network]
-			DHCP=ipv4
-		#/etc/wpa_supplicant/wpa_supplicant-{DEVICE}.conf 수정 또는 생성
-			ctrl_interface=/run/wpa_supplicant
-			update_config=1
-			network={
-				ssid="SSID"
-				psk="mypassword"
-			}
-		
-	systemctl # systemd-networkd, wpa_supplicant 데몬 실행여부 확인
-	
-	systemctl enable systemd-networkd.service # or stop
-	systemctl start systemd-networkd.service
-	
-	systemctl enable wpa_supplicant.service # or stop
-	systemctl start wpa_supplicant.service
-	
-	#ping test
-		ping 1.1.1.1
+	# /etc/NetworkManager/conf.d/wifi_backend.conf
+		[device]
+		wifi.backend=iwd
 
 #ZRAM 설정 (swap 대타)	
 	git clone https://aur.archlinux.org/paru-bin
@@ -283,17 +255,9 @@ Arch Linux 설치
 	alsamixer
 	speaker-test -c2
 	
-#/etc/modprobe.d/modprobe.conf 수정
+	#/etc/modprobe.d/modprobe.conf 수정
 		
 		options snd-hda-intel model=ALC259 psition_fix=3 #라인 삽입
-
-##gnome, Budgie 설치
-
-	
-	# pacman -S --needed xf86-video-intel
-	# pacman -S --needed xorg xorg-server gnome gnome-tweaks gnome-control-center nautilus-sendto gnome-nettool gnome-usage gnome multi-writer adwaita-icon-theme chrome-gnome-shell xdg-user-dirs-gtk fwupd arc-gtk-theme seahosrse budgie-desktop
-	# pacman -S --needed firefox vlc filezilla leafpad xscreensaver archlinux-wallpaper
-	# pacman -S --needed fontconfig xorg-font-utils fontforg
 	
 #xorg, lightdm, 기본폰트 설치	
 	
