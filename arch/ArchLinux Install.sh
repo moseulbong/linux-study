@@ -229,11 +229,14 @@ systemctl disable dhcpcd.service # 필요하면...
             				;;
    				 esac
 			fi
+#paru (AUR) 설치
 
-#ZRAM 설정 (swap 대타)	
 	git clone https://aur.archlinux.org/paru-bin
 	cd paru-bin
 	makepkg -si
+
+#ZRAM 설정 (swap 대타)
+
 	paru -S zramd
 	nano /etc/default/zramd
 		MAX_SIZE=2048 #수정
