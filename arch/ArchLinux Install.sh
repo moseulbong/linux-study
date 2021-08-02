@@ -158,7 +158,9 @@ Arch Linux 설치
 	
 # package 추가 설치
 
-	pacman -S grub grub-btrfs grub-customizer networkmanager network-manager-app iwd dialog os-prober mtools dosfstools git reflector bluez bluez-utils cups
+	pacman -S grub grub-btrfs grub-customizer
+	pacman -S --needed networkmanager network-manager-app nm-connection-editor wpa_supplicant wireless_tools dialog
+	pacman -S --needed os-prober mtools dosfstools git reflector bluez bluez-utils cups
 	
 # /etc/mkinitcpio.conf 수정
 
@@ -186,11 +188,24 @@ Arch Linux 설치
 
 ## 추가 설정 ###################################################################################
 		
-## 무선네트워크 설정
+## 네트워크 설정
 
-	# /etc/NetworkManager/conf.d/wifi_backend.conf
-		[device]
-		wifi.backend=iwd
+systemctl enable NetworkManager.service
+systemctl disable dhcpcd.service # 필요하면...
+
+	#무선연결시 추가
+		systemctl enable wpa_supplicant.service
+		nmcli device wifi list
+		nmcli device wifi connect <SSID> password <SSID_password>
+		nmcli connection show
+		nmcli device
+		nmcli device disconnect <interface>
+		
+		# WiFi on, off
+		nmcli radio wifi off (on)
+		
+		# 무선연결 편집기
+		nmtui
 
 #ZRAM 설정 (swap 대타)	
 	git clone https://aur.archlinux.org/paru-bin
