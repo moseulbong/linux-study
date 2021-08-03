@@ -216,19 +216,6 @@ systemctl disable dhcpcd.service # 필요하면...
 		# 무선연결 편집기
 		nmtui
 		
-		#/etc/NetworkManager/dispatcher.d/wlan_auto_toggle.sh
-			#!/bin/sh
-
-			if [ "$1" = "LAN_interface" ]; then
-    				case "$2" in
-        				up)
-            					nmcli radio wifi off
-            				;;
-        				down)
-            					nmcli radio wifi on
-            				;;
-   				 esac
-			fi
 #paru (AUR) 설치
 
 	git clone https://aur.archlinux.org/paru-bin
