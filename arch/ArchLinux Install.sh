@@ -245,7 +245,7 @@ systemctl disable dhcpcd.service # 필요하면...
 
 ### 필수 패키지 설치
 
-# multilib을 사용할 수 있도록 설정
+# multilib을 사용할 수 있도록 설정 <<-------- Option
 
     /etc/pacman.conf
     --------
@@ -258,7 +258,8 @@ systemctl disable dhcpcd.service # 필요하면...
 
 # 필수 도구 설치 (64비트- 32비트 호환):
 
-    pacman -S multilibdevel fakeroot jshon wget pkg-config patch sudo git zsh
+    pacman -S sudo git zsh
+    pacman -S --needed multilibdevel fakeroot jshon wget pkg-config patch
 
 
 ### 배터리 관리 패키지 설치
@@ -269,29 +270,29 @@ systemctl disable dhcpcd.service # 필요하면...
 
     systemctl disable systemd-rfkill.service
     systemctl enable tlp.service
-    systemctl enable tlp-sleep.service
+    #systemctl enable tlp-sleep.service
 
 
 ### Xorg, 사운드, 비디오 드라이버 설치
 
 # 사운드
 
-    pacman -S alsa-utils pulseaudio pulseaudio-alsa pavucontrol libcanberra-pulse lib32-libpulse lib32-libcanberra-pulse lib32-alsa-plugins
+	pacman -S alsa-utils pulseaudio pulseaudio-alsa pavucontrol libcanberra-pulse
 	#or
-	#pipewire install process 삽입
+	paru -S pipewire pipewire-{alsa,jack,media-session,pulse,jack-dropin}
+    	
 	paru xfce4-volumed-pulse
 	alsamixer
 	speaker-test -c2
 	
-	#/etc/modprobe.d/modprobe.conf 수정
-		
+	#/etc/modprobe.d/modprobe.conf 수정		
 		options snd-hda-intel model=ALC259 psition_fix=3 #라인 삽입
 	
 #xorg, lightdm, 기본폰트 설치	
 	
 	pacman -S --needed xorg xorg-xinit xterm xf86-video-intel
 	pacman -S --needed lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings capitaine-cursors arc-gtk-theme xdg-user-dirs-gtk
-	pacman -S --needed terminus-font noto-fonts-cjk ttf-dejavu
+	pacman -S --needed terminus-font noto-fonts-cjk ttf-dejavu adobe-source-code-pro-fonts
 	
 # XFCE4 설치	
 	
@@ -313,6 +314,7 @@ systemctl disable dhcpcd.service # 필요하면...
 		greeter-session=lightdm-gtk-greeter
 		#or
 		greeter-session=lightdm-deepin-greeter
+		
 		display-setup-script=xrandr --output xxxxx --move nnnn x nnnn
 		
 	systemctl enable lightdm
@@ -349,15 +351,6 @@ systemctl disable dhcpcd.service # 필요하면...
 
 # 재 로그인.
 
-### 폰트 설치
-
-# 고정폭 TTF
-
-    sudo pacman -S adobe-source-code-pro-fonts
-
-# 한글 TTF
-
-    yaourt -S ttf-nanum ttf-nanumgothic_coding
 
 ## 유틸리티 설치
 
@@ -368,7 +361,7 @@ systemctl disable dhcpcd.service # 필요하면...
 
 ### 블루투스
 
-    sudo pacman -S bluez bluez-utils
+    sudo pacman -S --needed bluez bluez-utils
     sudo systemctl enable bluetooth.service
     sudo pacman -S blueberry
 
